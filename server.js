@@ -6,7 +6,7 @@ const app = express();
 //Moteur de templates
 app.set("view engine", "ejs")
 
-//Middleware
+//Middlewares
 app.use("/assets", express.static("public"))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -16,10 +16,14 @@ app.use(session({
   saveUninitialized: true,
   cookie: { secure: false }
 }))
+app.use(require("./middlewares/flash"))
 //Routes
 app.get("/", (req, res) => {
-  console.log(req.session.error)
-  res.render("pages/index", { test: "Salut"})
+  if (req.session.error) {
+    res.locals.error = req.session.error
+  }
+  res.render("pages/index")
+  console.log(req.session)
 })
 app.post("/", (req, res) => {
   if (req.body.message === undefined || req.body.message === "") {
